@@ -1,3 +1,4 @@
+pip==22.2.*
 pandas
 datetime
 matplotlib.pyplot==3.6.*
