@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 import numpy as np
 
 # data preparation
-## read data
+## read data cek
 sheet_id = '1w4sszDjsLmMKZe-_m5VwBojI8l8FdqU5IdAD2iejLuc'
 flores_eq = pd.read_csv(f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv')
 flores_eq['date'] = pd.to_datetime(flores_eq['date'], format='%d/%m/%Y')
