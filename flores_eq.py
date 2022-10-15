@@ -9,7 +9,7 @@ import numpy as np
 ## read data
 sheet_id = '1w4sszDjsLmMKZe-_m5VwBojI8l8FdqU5IdAD2iejLuc'
 flores_eq = pd.read_csv(f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv')
-flores_eq['date'] = pd.to_datetime(flores_eq['date'])
+flores_eq['date'] = pd.to_datetime(flores_eq['date'], format='%d/%m/%Y')
 flores_eq['date'] = flores_eq['date'].dt.date
 flores_eq.rename(columns={'lat_deg': 'lat', 'long_deg': 'lon'}, inplace=True)
 
@@ -25,20 +25,22 @@ clusterer.fit(flores_latlong)
 clusterer.predict(flores_latlong)
 
 flores_latlong['predicted_label'] = clusterer.labels_.astype(int)
+cluster = flores_latlong['predicted_label'].unique()
 
 fig = plt.figure()
 scatter = plt.scatter(flores_latlong['lon'], flores_latlong['lat'], c=clusterer.labels_)
+#lab_legend=['Cluster ' + str(cluster[0]+1) , 'Cluster ' + str(cluster[1]+1), 'Cluster ' + str(cluster[2]+1)]
 lab_legend=['Cluster 1', 'Cluster 2', 'Cluster 3']
 plt.xlabel('Longitude')
 plt.ylabel('Latitude')
 plt.title('Segments of Kalaotoa Fault based on clustered eartquakes')
 plt.legend(handles=scatter.legend_elements()[0], labels= lab_legend)
-#print(flores_eq.head())
+print(scatter.legend_elements())
 
-#dashboard
+#dashboardss
 st.set_page_config(layout='wide')
 
-st.title('The Kalaotoa Fault: A Newly Identified Fault that Generated the Mw 7.3 Flores Sea Earthquake')
+st.title('The Kalaotoa Fault: A Newly Discovered Fault that Responsible for the Mw 7.3 Flores Sea Earthquake')
 
 st.header("A damaging earthquake in Indonesia is ascribed to a previously unknown fracture in Earth’s crust.")
 
@@ -53,11 +55,11 @@ with met3:
 with met4:
     st.metric('Damaged infrastructure', 736)
 
-st.write('There has been an earthquake on Tuesday, December 14, 2021 at 10:20:23 WIB with a magnitude of 7.4. ' +
-'The earthquake center (epicenter) is located at coordinates 7.59° South Latitude 122.25° East Longitude is located in the Flores Sea at a depth of 10 km. ' + 
+st.write('There has been an earthquake on Tuesday, December 14, 2021 at 10:20:23 WIB with a magnitude of 7.3. ' +
+'The epicenter is located at coordinates 7.59° South Latitude and 122.25° East Longitude (Flores Sea) at a depth of 10 km. ' + 
 'The earthquake has caused shocks in several areas with an intensity between II to VI on the Mercalli Modified Intensity (MMI) scale. ' +
- 'Judging from the source mechanism, this earthquake was triggered by shear fault activity. ' + 
- 'Based on sea level observations by BMKG, a tsunami after the M7.4 earthquake has been detected in the Flores Sea.')
+ 'Judging from the source mechanism, this earthquake was triggered by strike slip fault activity. ' + 
+ 'Based on sea level observations by BMKG, a tsunami after the M7.3 earthquake has been detected in the Flores Sea.')
 
 st.subheader('Earthquakes Distribution')
 
