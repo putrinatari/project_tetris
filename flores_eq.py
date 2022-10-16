@@ -11,7 +11,7 @@ from scipy import stats
 import matplotlib.dates as mdates
 from PIL import Image
 
-#made by Putri Natari Ratna
+# made by Putri Natari Ratna
 # data preparation
 ## read data
 sheet_id = '1w4sszDjsLmMKZe-_m5VwBojI8l8FdqU5IdAD2iejLuc'
