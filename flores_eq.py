@@ -117,10 +117,11 @@ with col12:
     st.write('Telah terjadi gempa pada hari Selasa, 14 Desember 2021 pukul 10:20:23 WIB dengan magnitudo 7.3. Pusat gempa terletak di Laut Flores ' +
     'pada koordinat 7.59°LS dan 122.24°BT dengan magnitudo 7.3 pada kedalaman 10 km dan berjarak sekitar 115 km utara Kota Maumere (ibu kota Kabupaten Sikka), ' +
     'Provinsi Nusa Tenggara Timur, atau berjarak sekitar 256,6 km tenggara Kota Benteng (ibu kota Kabupaten Kepulauan Selayar), Provinsi Sulawesi Selatan. ' +
-    'Dilihat dari mekanisme sumbernya, gempa ini dipicu oleh aktivitas sesar geser. Menurut data Badan Informasi Geospasial (BIG) kejadian gempa tersebut memicu ' +
+    'Dilihat dari mekanisme sumbernya, gempa ini dipicu oleh aktivitas Sesar Kalaotoa, sebuah sesar geser yang sebelumnya tidak diketahui keberadaannya. ' +
+    'Menurut data Badan Informasi Geospasial (BIG) kejadian gempa tersebut memicu ' +
     'terjadinya tsunami kecil setinggi 7 cm yang teramati di pantai Marapokot, Kabupaten Nagekeo, Provinsi Nusa Tenggara Timur. ')
 
-    st.write('Pulau Selayar dan Pulau Flores merupakan dua pulau yang terkena dampak dari gempa ini. ' + 
+st.write('Pulau Selayar dan Pulau Flores merupakan dua pulau yang terkena dampak dari gempa ini. ' + 
     'Guncangan maksimum terjadi di Kecamatan Pasilambena, Kabupaten Kepulauan Selayar dan mencapai skala intensitas VII MMI. ' + 
     'Menurut Badan Nasional Penanggulangan Bencana (BNPB), setidaknya 830 rumah hancur dan 1,249 rusak, dan 5,064 orang mengungsi. ' +
     'Data BPBD Kabupaten Kepulauan Selayar dan hasil pemeriksaan lapangan memperlihatkan bahwa dampak dari kejadian tersebut adalah 1 orang meninggal dunia, ' + 
@@ -128,8 +129,8 @@ with col12:
     'Kecamatan Pasimarannu, Pasilambena, Takabonerate, dan Pasimasunggu. Kecamatan Pasimarannu dan Pasilambena merupakan daerah terparah karena lokasinya ' +
     'terletak dekat dengan pusat gempa bumi. ')
 
-    st.write('**_Melihat besarnya dampak yang disebabkan oleh Sesar Kalaotoa, pemahaman mengenai sesar baru ini perlu ditingkatkan sebagai upaya mitigasi '+
-    'risiko bahaya gempa yang mungkin terjadi di masa yang akan datang._**' )
+st.write('**_Melihat besarnya dampak yang disebabkan oleh Sesar Kalaotoa, pemahaman mengenai sesar baru ini perlu ditingkatkan sebagai upaya mitigasi '+
+    'risiko bahaya gempa yang mungkin terjadi di masa yang akan datang._**' )  
 
 st.subheader('Earthquakes Distribution')
 
