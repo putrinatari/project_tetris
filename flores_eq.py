@@ -117,7 +117,7 @@ with col12:
     st.write('Telah terjadi gempa pada hari Selasa, 14 Desember 2021 pukul 10:20:23 WIB dengan magnitudo 7.3. Pusat gempa terletak di Laut Flores ' +
     'pada koordinat 7.59°LS dan 122.24°BT dengan magnitudo 7.3 pada kedalaman 10 km dan berjarak sekitar 115 km utara Kota Maumere (ibu kota Kabupaten Sikka), ' +
     'Provinsi Nusa Tenggara Timur, atau berjarak sekitar 256.6 km tenggara Kota Benteng (ibu kota Kabupaten Kepulauan Selayar), Provinsi Sulawesi Selatan. ' +
-    'Dilihat dari mekanisme sumbernya, gempa ini dipicu oleh aktivitas **_Sesar Kalaotoa_**, sebuah sesar geser yang sebelumnya tidak diketahui keberadaannya. ' +
+    'Dilihat dari mekanisme sumbernya, gempa ini dipicu oleh aktivitas Sesar Kalaotoa, sebuah sesar geser yang sebelumnya tidak diketahui keberadaannya. ' +
     'Menurut data Badan Informasi Geospasial (BIG) kejadian gempa tersebut memicu ' +
     'terjadinya tsunami kecil setinggi 7 cm yang teramati di pantai Marapokot, Kabupaten Nagekeo, Provinsi Nusa Tenggara Timur. ')
 
