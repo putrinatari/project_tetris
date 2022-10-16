@@ -4,14 +4,27 @@ import datetime as dt
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 import numpy as np
+from mpl_toolkits.basemap import Basemap
+from matplotlib.dates import DateFormatter
+from scipy import stats
+import matplotlib.dates as mdates
 
 # data preparation
-## read data cek
+## read data
 sheet_id = '1w4sszDjsLmMKZe-_m5VwBojI8l8FdqU5IdAD2iejLuc'
 flores_eq = pd.read_csv(f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv')
 flores_eq['date'] = pd.to_datetime(flores_eq['date'], format='%d/%m/%Y')
 flores_eq['date'] = flores_eq['date'].dt.date
 flores_eq.rename(columns={'lat_deg': 'lat', 'long_deg': 'lon'}, inplace=True)
+
+## plotting date vs magnitude
+fig1, ax = plt.subplots(figsize=(12, 8))
+ax.stem(flores_eq['date'], flores_eq['magnitude'], linefmt='black')
+ax.xaxis.set_major_formatter(DateFormatter("%Y-%m-%d"))
+ax.xaxis.set_major_locator(mdates.DayLocator(14))
+plt.xlabel('Date')
+plt.ylabel('Magnitude')
+plt.show()
 
 ## clustering
 flores_latlong = flores_eq[['lat','lon']]
@@ -23,19 +36,52 @@ clusterer.fit(flores_latlong)
 
 ###transform/predict
 clusterer.predict(flores_latlong)
-
 flores_latlong['predicted_label'] = clusterer.labels_.astype(int)
 cluster = flores_latlong['predicted_label'].unique()
 
-fig = plt.figure()
-scatter = plt.scatter(flores_latlong['lon'], flores_latlong['lat'], c=clusterer.labels_)
-#lab_legend=['Cluster ' + str(cluster[0]+1) , 'Cluster ' + str(cluster[1]+1), 'Cluster ' + str(cluster[2]+1)]
-lab_legend=['Cluster 1', 'Cluster 2', 'Cluster 3']
+# plotting clustered data & segment line
+## regression function
+def CreateLine(x, intercept, slope):
+  return slope * x + intercept
+
+## colors for clustered and segment
+colors = ['gold','indigo','teal']
+segs_colors = ['blue','green','brown']
+
+## plotting figure
+fig2 = plt.figure(figsize=[12,8])
+
+### basemap
+m = Basemap(resolution='i',
+            llcrnrlat=-9.2,urcrnrlat=-6.0,llcrnrlon=119.5,urcrnrlon=123.5)
+m.shadedrelief()
+plt.yticks(np.arange(-9.2, -6.0, step=1))
+plt.xticks(np.arange(119.5, 123.5, step=1))
+
+### scatter and segment
+for i in np.sort(np.unique(clusterer.labels_)):
+    filtered = flores_latlong[flores_latlong['predicted_label']==i]
+    filtered_long = filtered['lon']
+    filtered_lat = filtered['lat']
+    
+    slope, intercept, r, p, std_err = stats.linregress(filtered_long, filtered_lat)
+    
+    scatter = plt.scatter(filtered_long, filtered_lat, c=colors[i],label='Cluster ' + str(i + 1))
+    
+    regression_line = [CreateLine(i, intercept, slope) for i in filtered_long]
+    plt.plot(filtered_long, regression_line, c = segs_colors[i], label='Segment ' + str(i + 1), linewidth=4)
+    
 plt.xlabel('Longitude')
 plt.ylabel('Latitude')
 plt.title('Segments of Kalaotoa Fault based on clustered eartquakes')
-plt.legend(handles=scatter.legend_elements()[0], labels= lab_legend)
-print(scatter.legend_elements())
+plt.legend()
+plt.show()
+
+#scatter = plt.scatter(flores_latlong['lon'], flores_latlong['lat'], c=clusterer.labels_)
+#lab_legend=['Cluster ' + str(cluster[0]+1) , 'Cluster ' + str(cluster[1]+1), 'Cluster ' + str(cluster[2]+1)]
+#lab_legend=['Cluster 1', 'Cluster 2', 'Cluster 3']
+#plt.legend(handles=scatter.legend_elements()[0], labels= lab_legend)
+#print(scatter.legend_elements())
 
 #dashboardss
 st.set_page_config(layout='wide')
@@ -97,4 +143,4 @@ with col3:
      'Understanding this complex geological web is crucial to assessing which parts of Indonesia are most at risk from earthquakes.')
 
 with col4:
-    st.pyplot(fig)
+    st.pyplot(fig2)
