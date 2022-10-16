@@ -3,3 +3,5 @@ datetime
 matplotlib
 sklearn
 numpy
+basemap
+scipy
