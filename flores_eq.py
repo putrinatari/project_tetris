@@ -21,7 +21,7 @@ flores_eq['date'] = flores_eq['date'].dt.date
 flores_eq.rename(columns={'lat_deg': 'lat', 'long_deg': 'lon'}, inplace=True)
 
 ## plotting date vs magnitude
-fig1, ax = plt.subplots(figsize=(9, 6))
+fig1, ax = plt.subplots(figsize=(12, 8))
 ax.stem(flores_eq['date'], flores_eq['magnitude'], linefmt='black')
 ax.xaxis.set_major_formatter(DateFormatter("%Y-%m-%d"))
 ax.xaxis.set_major_locator(mdates.DayLocator(14))
