@@ -21,16 +21,17 @@ flores_eq['date'] = flores_eq['date'].dt.date
 flores_eq.rename(columns={'lat_deg': 'lat', 'long_deg': 'lon'}, inplace=True)
 
 ## plotting date vs magnitude
-fig1, ax = plt.subplots(figsize=(12, 8))
+fig1, ax = plt.subplots(figsize=(9, 6))
 ax.stem(flores_eq['date'], flores_eq['magnitude'], linefmt='black')
 ax.xaxis.set_major_formatter(DateFormatter("%Y-%m-%d"))
 ax.xaxis.set_major_locator(mdates.DayLocator(14))
 plt.xlabel('Date')
 plt.ylabel('Magnitude')
-ax.annotate('Mainshock', (datetime.strptime('2021-12-14','%Y-%m-%d'),7.4), size=16)
+plt.title('Magnitude vs Time', size = 16)
+ax.annotate('Mainshock', (datetime.strptime('2021-12-14','%Y-%m-%d'),7.4), size=14)
 ax.plot([datetime.strptime('2021-12-14','%Y-%m-%d'), datetime.strptime('2022-03-20','%Y-%m-%d')],[6.0,6.0],
        color='green', linestyle='--')
-ax.annotate('Aftershock', (datetime.strptime('2022-01-25','%Y-%m-%d'),6.1), size=16)
+ax.annotate('Aftershock', (datetime.strptime('2022-01-25','%Y-%m-%d'),6.1), size=14)
 plt.show()
 
 ## clustering
@@ -41,10 +42,21 @@ clusterer = KMeans(n_clusters=3)
 ### fit
 clusterer.fit(flores_latlong)
 
+
 ###transform/predict
 clusterer.predict(flores_latlong)
 flores_latlong['predicted_label'] = clusterer.labels_.astype(int)
 cluster = flores_latlong['predicted_label'].unique()
+
+### mapping
+centroids = flores_latlong.groupby(['predicted_label']).mean().reset_index()
+centroid = centroids.sort_values('lon', ascending=True).reset_index(drop=True).reset_index()
+
+mapping = dict(zip(centroid['predicted_label'], centroid['index']))
+
+flores_mapping = flores_latlong.copy()
+flores_mapping['predicted_label'] = flores_mapping['predicted_label'].apply(lambda x: mapping[x])
+
 
 # plotting clustered data & segment line
 ## regression function
@@ -67,7 +79,7 @@ plt.xticks(np.arange(119.5, 123.5, step=1))
 
 ### scatter and segment
 for i in np.sort(np.unique(clusterer.labels_)):
-    filtered = flores_latlong[flores_latlong['predicted_label']==i]
+    filtered = flores_mapping[flores_mapping['predicted_label']==i]
     filtered_long = filtered['lon']
     filtered_lat = filtered['lat']
     
@@ -83,6 +95,29 @@ plt.ylabel('Latitude')
 plt.title('Segments of Kalaotoa Fault based on clustered eartquakes')
 plt.legend()
 plt.show()
+
+#fig3 = plt.figure(figsize=[12,8])
+
+### basemap
+#m = Basemap(resolution='i',
+ #           llcrnrlat=-9.2,urcrnrlat=-6.0,llcrnrlon=119.5,urcrnrlon=123.5)
+#m.shadedrelief()
+#plt.yticks(np.arange(-9.2, -6.0, step=1))
+#plt.xticks(np.arange(119.5, 123.5, step=1))
+
+### scatter and segment
+#for i in np.sort(np.unique(clusterer.labels_)):
+ #   filtered = flores_latlong[flores_latlong['predicted_label']==i]
+  #  filtered_long = filtered['lon']
+   # filtered_lat = filtered['lat']
+    
+    #scatter = plt.scatter(filtered_long, filtered_lat, c=colors[i],label='Cluster ' + str(i + 1))
+    
+#plt.xlabel('Longitude')
+#plt.ylabel('Latitude')
+#plt.title('Segments of Kalaotoa Fault based on clustered eartquakes')
+#plt.legend()
+#plt.show()
 
 #scatter = plt.scatter(flores_latlong['lon'], flores_latlong['lat'], c=clusterer.labels_)
 #lab_legend=['Cluster ' + str(cluster[0]+1) , 'Cluster ' + str(cluster[1]+1), 'Cluster ' + str(cluster[2]+1)]
@@ -105,19 +140,19 @@ with met2:
 with met3:
     st.metric('Jumlah korban yang harus mengungsi', 5064)
 with met4:
-    st.metric('Jumlah infrastruktur yang rusak', 736)
+    st.metric('Jumlah infrastruktur yang rusak', 2079)
 
 col11, col12 = st.columns(2)
 with col11:
     image = Image.open('warga_mengungsi.jpeg')
-    st.image(image, caption='Warga Pulau Selayar yang mengungsi akibat gempa 14 Desember 2021')
+    st.image(image, caption='Gambar 1. Warga Pulau Selayar yang mengungsi akibat gempa 14 Desember 2021 (BPBD)')
 
 with col12:
 
     st.write('Telah terjadi gempa pada hari Selasa, 14 Desember 2021 pukul 10:20:23 WIB dengan magnitudo 7.3. Pusat gempa terletak di Laut Flores ' +
     'pada koordinat 7.59°LS dan 122.24°BT dengan magnitudo 7.3 pada kedalaman 10 km dan berjarak sekitar 115 km utara Kota Maumere (ibu kota Kabupaten Sikka), ' +
     'Provinsi Nusa Tenggara Timur, atau berjarak sekitar 256.6 km tenggara Kota Benteng (ibu kota Kabupaten Kepulauan Selayar), Provinsi Sulawesi Selatan. ' +
-    'Dilihat dari mekanisme sumbernya, gempa ini dipicu oleh aktivitas Sesar Kalaotoa, sebuah sesar geser yang sebelumnya tidak diketahui keberadaannya. ' +
+    'Dilihat dari mekanisme sumbernya, gempa ini dipicu oleh aktivitas **_Sesar Kalaotoa_**, sebuah sesar geser yang sebelumnya tidak diketahui keberadaannya. ' +
     'Menurut data Badan Informasi Geospasial (BIG) kejadian gempa tersebut memicu ' +
     'terjadinya tsunami kecil setinggi 7 cm yang teramati di pantai Marapokot, Kabupaten Nagekeo, Provinsi Nusa Tenggara Timur. ')
 
@@ -132,10 +167,25 @@ st.write('Pulau Selayar dan Pulau Flores merupakan dua pulau yang terkena dampak
 st.write('**_Melihat besarnya dampak yang disebabkan oleh Sesar Kalaotoa, pemahaman mengenai sesar baru ini perlu ditingkatkan sebagai upaya mitigasi '+
     'risiko bahaya gempa yang mungkin terjadi di masa yang akan datang._**' )  
 
-st.subheader('Earthquakes Distribution')
+st.subheader('Informasi Seputar Gempa')
 
 col1, col2 = st.columns(2)
 with col1:
+    start_time = dt.date(2021,12,14)
+    end_time = dt.date(2022,3,20)
+
+    select_period = st.slider('Select period:', min_value=start_time, max_value=end_time, value= start_time)
+
+    st.write('Distribusi gempa pada periode: ', start_time, 'to ', select_period)
+
+    # Filter data between two dates
+    filtered_df = flores_eq.loc[(flores_eq['date'] >= start_time) & (flores_eq['date'] <= select_period)]
+    print(filtered_df.tail())
+
+    st.map(filtered_df)
+    st.caption('Gambar 2. Distrisbusi gempa susulan akibat Gempa Laut Flores 2021')
+
+with col2:
     #def color_mag(val):
         #color = 'yellow' if val >= 5.0 else 'white'
         #return f'background-color: {color}'
@@ -144,29 +194,85 @@ with col1:
         #height = 650, 
         #use_container_width = True)
     st.pyplot(fig1)
+    st.caption('Gambar 3. Hubungan jumlah dan besar magnitudo dari gempa susulan dengan waktu')
+    
+st.write('Kejadian gempa utama tanggal 14 Desember 2021 di Laut FLores diikuti oleh serangkaian kejadian gempa susulan. ' + 
+'Hingga tanggal 20 Maret 2022 telah terjadi 1403 kali gempa susulan dengan magnitudo berkisar antara Mw 1.9 hingga Mw 5.9. ' +
+'Dapat dilihat pada Gambar 2, gempa susulan terdistribusi dalam arah barat barat laut hingga timur tenggara akibat adanya slip ' +
+'menganan dari aktivitas Sesar Kalaotoa. Gempa susulan ini juga memicu terjadinya gempa di Sesar Selayar yang merupakan ' +
+'sesar normal yang terletak di sebelah barat Sesar Kalaotoa. Gempa di Sesar Selayar tersebut diyakini sebagai akibat dari transfer stress ' +
+'dari Gempa Laut Flores 2021')
 
-with col2:
-    start_time = dt.date(2021,12,14)
-    end_time = dt.date(2022,3,20)
+st.write('Berdasarkan pemodelan _finite fault_ yang dilakukan oleh ANSS, proses _rupture_ terjadi pada sesar dengan dimensi 90 km x 40 km ' + 
+'dengan maksimum slip _coseismic_ sebesar 4 meter. Dengan besarnya dimensi tersebut, sesar membutuhkan waktu untuk dapat kembali ke kesetimbangan ' +
+'setelah melepaskan energi berupa gempa bermagnitudo 7.3. Hal ini dapat terlihat dari jumlah dan magnitudo dari gempa susulan yang terus menurun ' +
+'seperti yang ditunjukkan oleh Gambar 3.')
 
-    select_period = st.slider('Select period:', min_value=start_time, max_value=end_time, value= start_time)
+option = st.selectbox('Data Gempa Flores 2021', ('Tidak tampilkan data','Tampilkan data'))
+if option == 'Tampilkan data':
+    def color_mag(val):
+        color = 'yellow' if val >= 5.0 else 'white'
+        return f'background-color: {color}'
+    st.dataframe(
+        flores_eq.style.applymap(color_mag, subset=['magnitude']).format({'lat': '{:.3f}', 'lon': '{:.3f}', 'depth_km':'{:.3f}', 'magnitude':'{:.3f}'}), 
+        height = 200, 
+        use_container_width = True)
 
-    st.write('Period: ', start_time, 'to ', select_period)
 
-    # Filter data between two dates
-    filtered_df = flores_eq.loc[(flores_eq['date'] >= start_time) & (flores_eq['date'] <= select_period)]
-    print(filtered_df.tail())
-
-    st.map(filtered_df)
-
-st.subheader('Kalaotoa Fault and Its Three Segments')
+st.subheader('Tiga Segmen Sesar Kalaotoa')
 
 col3, col4 = st.columns(2)
 with col3:
-    st.write('A team led by Pepen Supendi at the University of Cambridge, UK, analysed the depth and locations of the main earthquake, ' +
-    'as well as 1,400 aftershocks in the months that followed. The scientists revealed the existence of a newly recognized fault, which they named the Kalaotoa fault.')
-    st.write('At least three segments of the fault slipped during the quake, transferring stress to other nearby faults. ' +
-     'Understanding this complex geological web is crucial to assessing which parts of Indonesia are most at risk from earthquakes.')
+    st.write('Sebuah tim yang dipimpin oleh Pepen Supendi di University of Cambridge, Inggris, menganalisis kedalaman dan ' +
+    'lokasi gempa utama, serta 1.400 gempa susulan dari Gempa Laut Flores 2021. ' + 
+    'Distribusi gempa susulan menunjukkan pola yang menarik, dengan setidaknya terdapat tiga cluster (Gambar 4) yang berkaitan dengan gempa utama Mw 7.3. ' +
+    'Cluster 2 disebabkan oleh slip pada sesar utama (segment 2) berorientasi timur-barat sepanjang ~100 km yang juga menyebabkan gempa Mw 7.3. Segment ini memicu ' +
+    'gempa pada segmen 3 (cluster 3) yang berorientasi tenggara sepanjang ~40 km di timur serta gempa pada segment 1 (cluster 1) yang berorientasi barat laut sepanjang ' +
+    '~50 km di barat. Berdasarkan analisis visual dari sebaran gempa susulan, lebar dari ketiga segmen ini adalah ~20 km.')
+
+    st.write('Kemudian, lokasi dari segment-segment sesar ini juga berdekatan dengan sesar lainnya yang tergolong aktif. Segment 1 yang berada di paling barat ' +
+    'berada di ujung atau dekat dengan Sesar Selayar, sementara Segment 3 yang berada di bagian tenggara dekat dengan _central back-arc thrust_. ' +
+    'Oleh karena itu, pergerakan dari segment-segment ini dapat memengaruhi atau memicu terjadinya gempa dari sumber-sumber gempa lainnya. ' +
+    'Identifikasi dan pemahaman sistem sesar baru ini merupakan tantangan besar, tetapi hal ini sangat penting jika kita ingin memahami bahaya seismik di Indonesia bagian timur.' )
 
 with col4:
+    #segment_cek = st.checkbox('Segment Sesar Kalaotoa')
+    #if segment_cek:
+        #st.pyplot(fig2)
+    #else:
     st.pyplot(fig2)
+    st.caption('Gambar 4. Segment Sesar Kalaotoa berdasarkan klusterisasi gempa')
+
+st.subheader('Kesimpulan')
+st.write('- Gempa Laut Flores Mw 7.3 dan gempa susulannya disebabkan oleh slip yang terjadi di sepanjang sistem Sesar Kalaotoa (sesar geser menganan) yang baru teridentifikasi.')
+st.write('- Gempa susulan terdistribusi dalam arah barat barat laut hingga timur tenggara.')
+st.write('- Distribusi gempa dapat dibagi menjadi tiga cluster yang mengindikasikan adanya tiga segmen sesar.')
+st.write('- Sesar Kalaotoa dapat dibagi menjadi tiga segment: Segment 1 (100 km) berorientasi timur-barat; Segment 2 (40 km) berorientasi tenggara; dan ' + 
+'Segment 3 (50 km) berorientasi barat laut.')
+st.write('- Daerah Kabupaten Kepulauan Selayar dan Kota Maumere tergolong rawan gempa bumi dan tsunami karena terletak dekat dengan sumber gempa bumi yaitu sesar aktif berupa sesar ' +
+'mendatar dan sesar naik busur belakang Flores di Laut Flores, serta sumber pembangkit tsunami yaitu sesar naik busur belakang Flores')
+
+
+st.subheader('Rekomendasi')
+st.write('- Pulau Selayar dan Pulau Flores tergolong kawasan rawan bencana geologi (gempa bumi, tsunami dan gerakan tanah). Oleh karena itu, upaya mitigasi bencana geologi secara struktural dan non struktural harus ditingkatkan. ' +
+'Mitigasi struktural dilakukan dengan membangun bangunan tahan gempa bumi, tempat dan jalur evakuasi, membangun tanggul pantai, menanam vegetasi pantai, dan lain-lain. Mitigasi non struktural dilakukan dengan ' +
+'meningkatkan kapasitas masyarakat dan aparat dalam menghadapi bencana geologi, misalnya : sosialisasi, simulasi dan wajib latih.')
+st.write('- Bangunan vital, strategis dan mengundang konsentrasi banyak orang agar dibangun mengikuti kaidah – kaidah bangunan tahan gempa bumi; menghindari membangun pada tanah urugan yang tidak memenuhi persyaratan ' + 
+'teknis karena rawan terhadap guncangan gempa bumi; menghindari membangun pada bagian atas punggungan, tebing lereng terjal yang telah mengalami pelapukan dan tanah menjadi gembur karena akan berpotensi terjadinya ' +
+'gerakan tanah yang dipicu oleh guncangan gempa bumi kuat dan curah hujan tinggi.')
+st.write('- Pemerintah Provinsi Sulawesi Selatan, Pemerintah Kabupaten Kepulauan Selayar, dan Pemerintah Provinsi Nusa Tenggara Timur direkomendasikan memasukkan materi kebencanaan geologi (gempa bumi, tsunami, letusan gunung api ' +
+'dan gerakan tanah) ke dalam kurikulum pendidikan agar para guru dan pelajar dapat memperoleh pengetahuan tentang mitigasi bencana geologi.')
+st.write('- Analisis _slip rate_ dan analisis seismotektonik menggunakan data GPS, data _bathymetri_, lintasan seismik, sebaran kegempaan, dan lain-lain diperlukan untuk memahami potensi bahaya seismik sehingga dapat dilakukan ' +
+'pemutakhiran peta Kawasan Rawan Bencana (KRB) gempa Pulau Selayar dan Pulau Flores).')
+
+st.subheader('Referensi')
+st.caption('Supendi, P., Rawlinson, N., Prayitno, B. S., Widiyantoro, S., Simanjuntak, A., Palgunadi, K. H., Kurniawan, A., Marliyani, G. I., Nugraha, A. D., Daryono, D., Anugrah, S. D., Fatchurochman, I., Gunawan, M. T., ' +
+'Sadly, M., Adi, S. P., Karnawati, D., & Arimuko, A. (2022). The Kalaotoa Fault: A Newly Identified Fault that Generated the Mw 7.3 Flores Sea Earthquake. The Seismic Record, 2(3), 176–185. https://doi.org/10.1785/0320220015')
+st.caption('https://vsi.esdm.go.id/index.php/gempabumi-a-tsunami/laporan-singkat-dan-rekomendasi-teknis/3903-laporan-singkat-dan-rekomendasi-teknis-gempa-bumi-tanggal-14-desember-2021-di-kabupaten-kepulauan-selayar-provinsi-sulawesi-selatan ' + 
+'diakses Oktober 2022')
+st.caption('https://cdn.bmkg.go.id/Web/Ulasan_gempabumi_14_Desember_2021_102023WIB_M7.4.pdf diakses Oktober 2022')
+st.caption('https://earthquake.usgs.gov/earthquakes/eventpage/at00r435a2/executive diakses Oktober 2022')
+st.caption('https://www.nature.com/articles/d41586-022-02134-8 diakses Oktober 2022')
+st.caption('https://bnpb.go.id/berita/-update-sebanyak-3-900-warga-kabupaten-kepulauan-selayar-mengungsi-akibat-gempabumi-m-7-4-di-laut-flores diakses Oktober 2022')
+st.caption('https://www.beritasatu.com/archive/868471/gempa-flores-5064-warga-mengungsi-dan-736-rumah-rusak diakses Oktober 2022')
+st.caption('https://en.wikipedia.org/wiki/2021_Flores_earthquake diakses Oktober 2022')
