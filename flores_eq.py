@@ -28,10 +28,10 @@ ax.xaxis.set_major_locator(mdates.DayLocator(14))
 plt.xlabel('Date')
 plt.ylabel('Magnitude')
 plt.title('Magnitude vs Time', size = 16)
-ax.annotate('Mainshock', (datetime.strptime('2021-12-14','%Y-%m-%d'),7.4), size=14)
+ax.annotate('Gempa utama', (datetime.strptime('2021-12-14','%Y-%m-%d'),7.4), size=14)
 ax.plot([datetime.strptime('2021-12-14','%Y-%m-%d'), datetime.strptime('2022-03-20','%Y-%m-%d')],[6.0,6.0],
        color='green', linestyle='--')
-ax.annotate('Aftershock', (datetime.strptime('2022-01-25','%Y-%m-%d'),6.1), size=14)
+ax.annotate('Gempa susulan', (datetime.strptime('2022-01-25','%Y-%m-%d'),6.1), size=14)
 plt.show()
 
 ## clustering
@@ -150,7 +150,7 @@ with col11:
 with col12:
 
     st.write('Telah terjadi gempa pada hari Selasa, 14 Desember 2021 pukul 10:20:23 WIB dengan magnitudo 7.3. Pusat gempa terletak di Laut Flores ' +
-    'pada koordinat 7.59°LS dan 122.24°BT dengan magnitudo 7.3 pada kedalaman 10 km dan berjarak sekitar 115 km utara Kota Maumere (ibu kota Kabupaten Sikka), ' +
+    'pada koordinat 7.59°LS dan 122.24°BT pada kedalaman 10 km dan berjarak sekitar 115 km utara Kota Maumere (ibu kota Kabupaten Sikka), ' +
     'Provinsi Nusa Tenggara Timur, atau berjarak sekitar 256.6 km tenggara Kota Benteng (ibu kota Kabupaten Kepulauan Selayar), Provinsi Sulawesi Selatan. ' +
     'Dilihat dari mekanisme sumbernya, gempa ini dipicu oleh aktivitas **_Sesar Kalaotoa_**, sebuah sesar geser yang sebelumnya tidak diketahui keberadaannya. ' +
     'Menurut data Badan Informasi Geospasial (BIG) kejadian gempa tersebut memicu ' +
@@ -193,23 +193,33 @@ with col2:
         #flores_eq.style.applymap(color_mag, subset=['magnitude']).format({'lat': '{:.3f}', 'lon': '{:.3f}', 'depth_km':'{:.3f}', 'magnitude':'{:.3f}'}), 
         #height = 650, 
         #use_container_width = True)
+    st.info('**NOTE**' + '\n' '- Geser slider untuk melihat distribusi gempa susulan pada rentang waktu tertentu' + '\n'
+    '- Lingkaran merah menunjukkan gempa yang terjadi')
+    
+
+    st.write('Kejadian gempa utama tanggal 14 Desember 2021 di Laut FLores diikuti oleh serangkaian kejadian gempa susulan. ' + 
+    'Hingga tanggal 20 Maret 2022 telah terjadi 1403 kali gempa susulan dengan magnitudo berkisar antara Mw 1.9 hingga Mw 5.9. ' +
+    'Dapat dilihat pada Gambar 2, gempa susulan terdistribusi dalam arah barat barat laut hingga timur tenggara akibat adanya slip ' +
+    'menganan dari aktivitas Sesar Kalaotoa. Gempa susulan ini juga memicu terjadinya gempa di Sesar Selayar yang merupakan ' +
+    'sesar normal yang terletak di sebelah barat Sesar Kalaotoa. Gempa di Sesar Selayar tersebut diyakini sebagai akibat dari transfer stress ' +
+    'dari Gempa Laut Flores 2021')
+
+col5, col6 = st.columns(2)
+with col5:
+    st.info('**NOTE**' + '\n' '- _Chart_ di samping menunjukkan hubungan jumlah dan magnitudo gempa susulan dengan waktu' + '\n'
+    '- Garis putus-putus hijau menunjukkan rentang waktu terjadinya gempa susulan')
+    
+    st.write('Berdasarkan pemodelan _finite fault_ yang dilakukan oleh ANSS, proses _rupture_ terjadi pada sesar dengan dimensi 90 km x 40 km ' + 
+    'dengan maksimum slip _coseismic_ sebesar 4 meter. Dengan besarnya dimensi tersebut, sesar membutuhkan waktu untuk dapat kembali ke kesetimbangan ' +
+    'setelah melepaskan energi berupa gempa bermagnitudo 7.3. Hal ini dapat terlihat dari jumlah dan magnitudo dari gempa susulan yang terus menurun ' +
+    'seperti yang ditunjukkan oleh Gambar 3.')
+
+with col6:
     st.pyplot(fig1)
     st.caption('Gambar 3. Hubungan jumlah dan besar magnitudo dari gempa susulan dengan waktu')
     
-st.write('Kejadian gempa utama tanggal 14 Desember 2021 di Laut FLores diikuti oleh serangkaian kejadian gempa susulan. ' + 
-'Hingga tanggal 20 Maret 2022 telah terjadi 1403 kali gempa susulan dengan magnitudo berkisar antara Mw 1.9 hingga Mw 5.9. ' +
-'Dapat dilihat pada Gambar 2, gempa susulan terdistribusi dalam arah barat barat laut hingga timur tenggara akibat adanya slip ' +
-'menganan dari aktivitas Sesar Kalaotoa. Gempa susulan ini juga memicu terjadinya gempa di Sesar Selayar yang merupakan ' +
-'sesar normal yang terletak di sebelah barat Sesar Kalaotoa. Gempa di Sesar Selayar tersebut diyakini sebagai akibat dari transfer stress ' +
-'dari Gempa Laut Flores 2021')
 
-st.write('Berdasarkan pemodelan _finite fault_ yang dilakukan oleh ANSS, proses _rupture_ terjadi pada sesar dengan dimensi 90 km x 40 km ' + 
-'dengan maksimum slip _coseismic_ sebesar 4 meter. Dengan besarnya dimensi tersebut, sesar membutuhkan waktu untuk dapat kembali ke kesetimbangan ' +
-'setelah melepaskan energi berupa gempa bermagnitudo 7.3. Hal ini dapat terlihat dari jumlah dan magnitudo dari gempa susulan yang terus menurun ' +
-'seperti yang ditunjukkan oleh Gambar 3.')
-
-option = st.selectbox('Data Gempa Flores 2021', ('Tidak tampilkan data','Tampilkan data'))
-if option == 'Tampilkan data':
+with st.expander("Data Gempa Laut Flores 2021"):
     def color_mag(val):
         color = 'yellow' if val >= 5.0 else 'white'
         return f'background-color: {color}'
@@ -235,6 +245,9 @@ with col3:
     'Oleh karena itu, pergerakan dari segment-segment ini dapat memengaruhi atau memicu terjadinya gempa dari sumber-sumber gempa lainnya. ' +
     'Identifikasi dan pemahaman sistem sesar baru ini merupakan tantangan besar, tetapi hal ini sangat penting jika kita ingin memahami bahaya seismik di Indonesia bagian timur.' )
 
+    st.info('**Note:**' + '\n' 'Sesar Selayar dan _central back-arc thrust_ tidak diperlihatkan pada Gambar 4.' + '\n'
+    'Struktur geologi di sekitar Laut Flores dapat dilihat pada link berikut: https://www.greeners.co/wp-content/uploads/2018/08/Para-Ahli-Aktivitas-Flores-Back-Arc-Thrust-Penyebab-Gempa-Lombok_02.jpg')
+
 with col4:
     #segment_cek = st.checkbox('Segment Sesar Kalaotoa')
     #if segment_cek:
@@ -247,14 +260,14 @@ st.subheader('Kesimpulan')
 st.write('- Gempa Laut Flores Mw 7.3 dan gempa susulannya disebabkan oleh slip yang terjadi di sepanjang sistem Sesar Kalaotoa (sesar geser menganan) yang baru teridentifikasi.')
 st.write('- Gempa susulan terdistribusi dalam arah barat barat laut hingga timur tenggara.')
 st.write('- Distribusi gempa dapat dibagi menjadi tiga cluster yang mengindikasikan adanya tiga segmen sesar.')
-st.write('- Sesar Kalaotoa dapat dibagi menjadi tiga segment: Segment 1 (100 km) berorientasi timur-barat; Segment 2 (40 km) berorientasi tenggara; dan ' + 
-'Segment 3 (50 km) berorientasi barat laut.')
+st.write('- Sesar Kalaotoa dapat dibagi menjadi tiga segment: Segment 1 (50 km) berorientasi barat laut; Segment 2 (100 km) berorientasi timur-barat; dan ' + 
+'Segment 3 (40 km) berorientasi tenggara.')
 st.write('- Daerah Kabupaten Kepulauan Selayar dan Kota Maumere tergolong rawan gempa bumi dan tsunami karena terletak dekat dengan sumber gempa bumi yaitu sesar aktif berupa sesar ' +
-'mendatar dan sesar naik busur belakang Flores di Laut Flores, serta sumber pembangkit tsunami yaitu sesar naik busur belakang Flores')
+'mendatar (Sesar Selayar dan Sesar Kalaotoa) dan _central back-arc thrust_ di Laut Flores, serta sumber pembangkit tsunami yaitu _central back-arc thrust_.')
 
 
 st.subheader('Rekomendasi')
-st.write('- Pulau Selayar dan Pulau Flores tergolong kawasan rawan bencana geologi (gempa bumi, tsunami dan gerakan tanah). Oleh karena itu, upaya mitigasi bencana geologi secara struktural dan non struktural harus ditingkatkan. ' +
+st.write('- Pulau Selayar dan Pulau Flores tergolong kawasan rawan bencana geologi (gempa bumi dan tsunami). Oleh karena itu, upaya mitigasi bencana geologi secara struktural dan non struktural harus ditingkatkan. ' +
 'Mitigasi struktural dilakukan dengan membangun bangunan tahan gempa bumi, tempat dan jalur evakuasi, membangun tanggul pantai, menanam vegetasi pantai, dan lain-lain. Mitigasi non struktural dilakukan dengan ' +
 'meningkatkan kapasitas masyarakat dan aparat dalam menghadapi bencana geologi, misalnya : sosialisasi, simulasi dan wajib latih.')
 st.write('- Bangunan vital, strategis dan mengundang konsentrasi banyak orang agar dibangun mengikuti kaidah – kaidah bangunan tahan gempa bumi; menghindari membangun pada tanah urugan yang tidak memenuhi persyaratan ' + 
@@ -276,3 +289,4 @@ st.caption('https://www.nature.com/articles/d41586-022-02134-8 diakses Oktober 2
 st.caption('https://bnpb.go.id/berita/-update-sebanyak-3-900-warga-kabupaten-kepulauan-selayar-mengungsi-akibat-gempabumi-m-7-4-di-laut-flores diakses Oktober 2022')
 st.caption('https://www.beritasatu.com/archive/868471/gempa-flores-5064-warga-mengungsi-dan-736-rumah-rusak diakses Oktober 2022')
 st.caption('https://en.wikipedia.org/wiki/2021_Flores_earthquake diakses Oktober 2022')
+st.caption('https://www.greeners.co/berita/para-ahli-aktivitas-flores-back-arc-thrust-penyebab-gempa-lombok/ diakses Oktober 2022')
